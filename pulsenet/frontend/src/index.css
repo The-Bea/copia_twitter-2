@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  background: #111827;
+  color: white;
+  font-family: Arial;
+}
+
+.container,
+.feed {
+  width: 500px;
+  margin: auto;
+  padding-top: 40px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.post {
+  background: #1f2937;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 12px;
+}
