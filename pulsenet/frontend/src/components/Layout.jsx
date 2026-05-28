@@ -5,11 +5,17 @@ export default function Layout() {
     return (
         <div className="app-layout">
 
-        <Sidebar />
+            {/* SIDEBAR FIXA */}
+            <Sidebar />
 
-        <main className="main-content">
-            <Outlet />
-        </main>
+            {/* CONTEÚDO CENTRAL */}
+            <main className="main-content">
+
+                <div className="content-wrapper">
+                    <Outlet />
+                </div>
+
+            </main>
 
         </div>
     )

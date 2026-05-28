@@ -30,7 +30,6 @@ function Feed() {
         try {
             const res = await api.post('posts/create/', { content })
 
-            // melhora UX: adiciona sem reload total
             setPosts(prev => [res.data, ...prev])
             setContent('')
 
@@ -43,7 +42,6 @@ function Feed() {
         try {
             await api.post(`posts/like/${id}/`)
 
-            // atualização local (evita reload do feed inteiro)
             setPosts(prev =>
                 prev.map(post =>
                     post.id === id
@@ -57,21 +55,16 @@ function Feed() {
         }
     }
 
-    function logout() {
-        localStorage.removeItem('token')
-        navigate('/')
-    }
-
     return (
-        <div className="page">
+        <div className="page feed-page">
 
-            {/* HEADER */}
+            {/* HEADER FIXO */}
             <div className="feed-header">
                 <h2>Home</h2>
             </div>
 
             {/* COMPOSER */}
-            <div className="composer">
+            <div className="composer card">
 
                 <textarea
                     placeholder="O que está acontecendo?"
@@ -90,7 +83,7 @@ function Feed() {
                 <p className="empty">Carregando...</p>
             ) : (
                 posts.map((post) => (
-                    <div className="post" key={post.id}>
+                    <div className="post card" key={post.id}>
 
                         <div className="post-header">
                             <div className="avatar" />
@@ -101,7 +94,9 @@ function Feed() {
                             </div>
                         </div>
 
-                        <p className="content">{post.content}</p>
+                        <p className="content-text">
+                            {post.content}
+                        </p>
 
                         <div className="actions">
                             <button onClick={() => likePost(post.id)}>

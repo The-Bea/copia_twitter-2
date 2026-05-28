@@ -14,24 +14,41 @@ function Sidebar() {
     return (
         <aside className="sidebar">
 
-            <div className="logo">DizConect</div>
+            {/* LOGO */}
+            <div className="logo">
+                DizConect
+            </div>
 
+            {/* NAV */}
             <nav className="nav">
 
-                <Link className={`nav-item ${isActive('/feed') ? 'active' : ''}`} to="/feed">
-                    <span>🏠</span> Home
+                <Link
+                    className={`nav-item ${isActive('/feed') ? 'active' : ''}`}
+                    to="/feed"
+                >
+                    <span className="icon">🏠</span>
+                    <span>Home</span>
                 </Link>
 
-                <Link className={`nav-item ${isActive('/trends') ? 'active' : ''}`} to="/trends">
-                    <span>🔥</span> Trends
+                <Link
+                    className={`nav-item ${isActive('/trends') ? 'active' : ''}`}
+                    to="/trends"
+                >
+                    <span className="icon">🔥</span>
+                    <span>Trends</span>
                 </Link>
 
-                <Link className={`nav-item ${isActive('/perfil') ? 'active' : ''}`} to="/perfil">
-                    <span>👤</span> Perfil
+                <Link
+                    className={`nav-item ${isActive('/perfil') ? 'active' : ''}`}
+                    to="/perfil"
+                >
+                    <span className="icon">👤</span>
+                    <span>Perfil</span>
                 </Link>
 
             </nav>
 
+            {/* LOGOUT */}
             <button className="logout-btn" onClick={logout}>
                 Sair
             </button>
