@@ -8,7 +8,9 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 
 
-
+# -----------------------------
+# FEED (FOLLOW + PRÓPRIOS POSTS)
+# -----------------------------
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def feed(request):
@@ -26,10 +28,15 @@ def feed(request):
     return Response(serializer.data)
 
 
-#  CRIAR POST
+# -----------------------------
+# CRIAR POST
+# -----------------------------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
+    if not request.data.get('content'):
+        return Response({'error': 'Conteúdo vazio'}, status=400)
+
     post = Post.objects.create(
         user=request.user,
         content=request.data['content']
@@ -39,11 +46,16 @@ def create_post(request):
     return Response(serializer.data)
 
 
-#  LIKE / UNLIKE
+# -----------------------------
+# LIKE / UNLIKE
+# -----------------------------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def like_post(request, pk):
-    post = Post.objects.get(id=pk)
+    try:
+        post = Post.objects.get(id=pk)
+    except Post.DoesNotExist:
+        return Response({'error': 'Post não encontrado'}, status=404)
 
     if request.user in post.likes.all():
         post.likes.remove(request.user)
@@ -53,11 +65,19 @@ def like_post(request, pk):
     return Response({'likes': post.likes.count()})
 
 
-#  COMENTÁRIO
+# -----------------------------
+# COMENTÁRIO
+# -----------------------------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_comment(request, pk):
-    post = Post.objects.get(id=pk)
+    try:
+        post = Post.objects.get(id=pk)
+    except Post.DoesNotExist:
+        return Response({'error': 'Post não encontrado'}, status=404)
+
+    if not request.data.get('content'):
+        return Response({'error': 'Comentário vazio'}, status=400)
 
     comment = Comment.objects.create(
         post=post,
@@ -69,7 +89,9 @@ def add_comment(request, pk):
     return Response(serializer.data)
 
 
-#  ME
+# -----------------------------
+# ME
+# -----------------------------
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me(request):
@@ -81,11 +103,15 @@ def me(request):
     })
 
 
+# -----------------------------
 # MEUS POSTS
+# -----------------------------
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_posts(request):
-    posts = Post.objects.filter(user=request.user)
-    serializer = PostSerializer(posts, many=True)
+    posts = Post.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
 
+    serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)

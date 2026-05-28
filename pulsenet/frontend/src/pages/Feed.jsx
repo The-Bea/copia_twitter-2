@@ -9,6 +9,10 @@ function Feed() {
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(true)
 
+    useEffect(() => {
+        fetchFeed()
+    }, [])
+
     async function fetchFeed() {
         try {
             const response = await api.get('posts/feed/')
@@ -20,21 +24,37 @@ function Feed() {
         }
     }
 
-    useEffect(() => {
-        fetchFeed()
-    }, [])
-
     async function createPost() {
         if (!content.trim()) return
 
-        await api.post('posts/create/', { content })
-        setContent('')
-        fetchFeed()
+        try {
+            const res = await api.post('posts/create/', { content })
+
+            // melhora UX: adiciona sem reload total
+            setPosts(prev => [res.data, ...prev])
+            setContent('')
+
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     async function likePost(id) {
-        await api.post(`posts/like/${id}/`)
-        fetchFeed()
+        try {
+            await api.post(`posts/like/${id}/`)
+
+            // atualização local (evita reload do feed inteiro)
+            setPosts(prev =>
+                prev.map(post =>
+                    post.id === id
+                        ? { ...post, likes_count: (post.likes_count || 0) + 1 }
+                        : post
+                )
+            )
+
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     function logout() {
@@ -67,7 +87,7 @@ function Feed() {
 
             {/* FEED */}
             {loading ? (
-                <p>Carregando...</p>
+                <p className="empty">Carregando...</p>
             ) : (
                 posts.map((post) => (
                     <div className="post" key={post.id}>
