@@ -5,7 +5,8 @@ from .views import (
     is_following,
     me,
     my_posts,
-    update_profile
+    update_profile,
+    get_user
 )
 
 urlpatterns = [
@@ -14,6 +15,7 @@ urlpatterns = [
     # social system
     path('follow/<int:user_id>/', follow_user),
     path('is-following/<int:user_id>/', is_following),
+    path('<int:user_id>/', get_user),
 
     # profile
     path('me/', me),

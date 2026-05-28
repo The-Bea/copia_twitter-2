@@ -2,15 +2,20 @@ import { useEffect, useState } from 'react'
 import api from '../services/api'
 import FollowButton from '../components/FollowButton'
 
+const API_URL = 'http://127.0.0.1:8000'
+
 function Profile() {
     const [user, setUser] = useState(null)
     const [posts, setPosts] = useState([])
 
     const [editing, setEditing] = useState(false)
+
     const [username, setUsername] = useState('')
     const [bio, setBio] = useState('')
     const [password, setPassword] = useState('')
+
     const [avatar, setAvatar] = useState(null)
+    const [avatarPreview, setAvatarPreview] = useState(null)
 
     useEffect(() => {
         loadProfile()
@@ -21,11 +26,17 @@ function Profile() {
             const userRes = await api.get('users/me/')
             const postsRes = await api.get('users/my-posts/')
 
-            setUser(userRes.data)
+            const userData = userRes.data
+
+            if (userData.avatar && !userData.avatar.startsWith('http')) {
+                userData.avatar = `${API_URL}${userData.avatar}`
+            }
+
+            setUser(userData)
             setPosts(postsRes.data)
 
-            setUsername(userRes.data.username)
-            setBio(userRes.data.bio || '')
+            setUsername(userData.username)
+            setBio(userData.bio || '')
 
         } catch (err) {
             console.log('ERRO PROFILE:', err)
@@ -50,7 +61,9 @@ function Profile() {
 
             setPassword('')
             setAvatar(null)
+            setAvatarPreview(null)
             setEditing(false)
+
             loadProfile()
 
         } catch (err) {
@@ -74,25 +87,27 @@ function Profile() {
 
                     <div className="profile-top">
 
-                        {/* AVATAR EDITÁVEL */}
+                        {/* AVATAR */}
                         <label htmlFor="avatarInput">
-                            {user.avatar ? (
-                                <img
-                                    src={user.avatar}
-                                    className="avatar large"
-                                    alt="avatar"
-                                />
-                            ) : (
-                                <div className="avatar large" />
-                            )}
+                            <img
+                                src={avatarPreview || user.avatar}
+                                className="avatar large"
+                                alt="avatar"
+                            />
                         </label>
 
+                        {/* INPUT FILE (só no modo edição) */}
                         <input
                             id="avatarInput"
                             type="file"
                             hidden
                             accept="image/*"
-                            onChange={(e) => setAvatar(e.target.files[0])}
+                            disabled={!editing}
+                            onChange={(e) => {
+                                const file = e.target.files[0]
+                                setAvatar(file)
+                                setAvatarPreview(URL.createObjectURL(file))
+                            }}
                         />
 
                         <FollowButton userId={user.id} />
@@ -105,7 +120,6 @@ function Profile() {
                     </p>
 
                     <div className="profile-stats">
-
                         <div>
                             <strong>{posts.length}</strong>
                             <span>Posts</span>
@@ -120,7 +134,6 @@ function Profile() {
                             <strong>0</strong>
                             <span>Seguindo</span>
                         </div>
-
                     </div>
 
                 </div>
@@ -163,7 +176,6 @@ function Profile() {
 
             {/* POSTS */}
             <div className="profile-posts">
-
                 <h3>Posts</h3>
 
                 {posts.length === 0 ? (
@@ -175,7 +187,6 @@ function Profile() {
                         </div>
                     ))
                 )}
-
             </div>
 
         </div>

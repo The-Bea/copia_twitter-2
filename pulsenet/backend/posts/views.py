@@ -100,6 +100,8 @@ def me(request):
     return Response({
         'id': user.id,
         'username': user.username,
+        'bio': getattr(user.profile, 'bio', ''),
+        'avatar': request.build_absolute_uri(user.profile.avatar.url) if user.profile.avatar else None
     })
 
 

@@ -80,6 +80,8 @@ def me(request):
     return Response({
         'id': user.id,
         'username': user.username,
+        'bio': getattr(user.profile, 'bio', ''),
+        'avatar': request.build_absolute_uri(user.profile.avatar.url) if user.profile.avatar else None
     })
 
 
@@ -100,26 +102,52 @@ def my_posts(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_profile(request):
+    print("DATA:", request.data)
+    print("FILES:", request.FILES)
+
     user = request.user
     profile = user.profile
 
+    # username
     username = request.data.get('username')
     if username:
         user.username = username
 
+    # password
     password = request.data.get('password')
     if password:
         user.set_password(password)
 
+    # bio
     bio = request.data.get('bio')
     if bio is not None:
         profile.bio = bio
+
+    # AVATAR
+    if 'avatar' in request.FILES:
+        profile.avatar = request.FILES['avatar']
 
     user.save()
     profile.save()
 
     return Response({
         "status": "updated",
+        "id": user.id,
         "username": user.username,
-        "bio": profile.bio
+        "bio": profile.bio,
+        "avatar": request.build_absolute_uri(profile.avatar.url) if profile.avatar else None
     })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+
+        return Response({
+            "id": user.id,
+            "username": user.username,
+        })
+
+    except User.DoesNotExist:
+        return Response({"error": "not found"}, status=404)
