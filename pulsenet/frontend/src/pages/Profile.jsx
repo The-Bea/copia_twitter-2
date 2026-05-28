@@ -10,6 +10,7 @@ function Profile() {
     const [username, setUsername] = useState('')
     const [bio, setBio] = useState('')
     const [password, setPassword] = useState('')
+    const [avatar, setAvatar] = useState(null)
 
     useEffect(() => {
         loadProfile()
@@ -32,19 +33,28 @@ function Profile() {
     }
 
     async function updateProfile() {
+        const formData = new FormData()
+
+        formData.append('username', username)
+        formData.append('bio', bio)
+
+        if (password) formData.append('password', password)
+        if (avatar) formData.append('avatar', avatar)
+
         try {
-            await api.put('users/update-profile/', {
-                username,
-                bio,
-                password: password || undefined
+            await api.put('users/update-profile/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             })
 
             setPassword('')
+            setAvatar(null)
             setEditing(false)
             loadProfile()
 
         } catch (err) {
-            console.log(err)
+            console.log('ERRO AO SALVAR PERFIL:', err)
         }
     }
 
@@ -63,7 +73,27 @@ function Profile() {
                 <div className="profile-info-card">
 
                     <div className="profile-top">
-                        <div className="avatar large" />
+
+                        {/* AVATAR EDITÁVEL */}
+                        <label htmlFor="avatarInput">
+                            {user.avatar ? (
+                                <img
+                                    src={user.avatar}
+                                    className="avatar large"
+                                    alt="avatar"
+                                />
+                            ) : (
+                                <div className="avatar large" />
+                            )}
+                        </label>
+
+                        <input
+                            id="avatarInput"
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={(e) => setAvatar(e.target.files[0])}
+                        />
 
                         <FollowButton userId={user.id} />
                     </div>
@@ -96,14 +126,12 @@ function Profile() {
                 </div>
             </div>
 
-            {/* EDIT PROFILE */}
-            <button
-                className="edit-btn"
-                onClick={() => setEditing(!editing)}
-            >
+            {/* BOTÃO EDITAR */}
+            <button className="edit-btn" onClick={() => setEditing(!editing)}>
                 {editing ? 'Cancelar' : 'Editar perfil'}
             </button>
 
+            {/* EDIT FORM */}
             {editing && (
                 <div className="edit-box">
 
@@ -126,7 +154,7 @@ function Profile() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
 
-                    <button onClick={updateProfile}>
+                    <button onClick={updateProfile} className="save-btn">
                         Salvar alterações
                     </button>
 

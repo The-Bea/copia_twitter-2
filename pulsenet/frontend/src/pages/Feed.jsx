@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
-import { useNavigate } from 'react-router-dom'
 
 function Feed() {
-    const navigate = useNavigate()
 
     const [posts, setPosts] = useState([])
     const [content, setContent] = useState('')
     const [loading, setLoading] = useState(true)
+
+    const [commentText, setCommentText] = useState({})
+    const [comments, setComments] = useState({})
 
     useEffect(() => {
         fetchFeed()
@@ -15,8 +16,8 @@ function Feed() {
 
     async function fetchFeed() {
         try {
-            const response = await api.get('posts/feed/')
-            setPosts(response.data)
+            const res = await api.get('posts/feed/')
+            setPosts(res.data)
         } catch (err) {
             console.log(err)
         } finally {
@@ -29,10 +30,8 @@ function Feed() {
 
         try {
             const res = await api.post('posts/create/', { content })
-
             setPosts(prev => [res.data, ...prev])
             setContent('')
-
         } catch (err) {
             console.log(err)
         }
@@ -40,15 +39,39 @@ function Feed() {
 
     async function likePost(id) {
         try {
-            await api.post(`posts/like/${id}/`)
+            const res = await api.post(`posts/like/${id}/`)
 
             setPosts(prev =>
                 prev.map(post =>
                     post.id === id
-                        ? { ...post, likes_count: (post.likes_count || 0) + 1 }
+                        ? { ...post, likes_count: res.data.likes }
                         : post
                 )
             )
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async function addComment(postId) {
+        const text = commentText[postId]
+
+        if (!text || !text.trim()) return
+
+        try {
+            const res = await api.post(`posts/comment/${postId}/`, {
+                content: text
+            })
+
+            setComments(prev => ({
+                ...prev,
+                [postId]: [...(prev[postId] || []), res.data]
+            }))
+
+            setCommentText(prev => ({
+                ...prev,
+                [postId]: ''
+            }))
 
         } catch (err) {
             console.log(err)
@@ -58,54 +81,63 @@ function Feed() {
     return (
         <div className="page feed-page">
 
-            {/* HEADER FIXO */}
             <div className="feed-header">
                 <h2>Home</h2>
             </div>
 
-            {/* COMPOSER */}
+            {/* POSTAR */}
             <div className="composer card">
-
                 <textarea
                     placeholder="O que está acontecendo?"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                 />
-
                 <button onClick={createPost}>
                     Postar
                 </button>
-
             </div>
 
             {/* FEED */}
             {loading ? (
-                <p className="empty">Carregando...</p>
+                <p>Carregando...</p>
             ) : (
-                posts.map((post) => (
+                posts.map(post => (
                     <div className="post card" key={post.id}>
 
-                        <div className="post-header">
-                            <div className="avatar" />
-
-                            <div>
-                                <strong>@{post.username}</strong>
-                                <p className="time">agora</p>
-                            </div>
-                        </div>
-
-                        <p className="content-text">
-                            {post.content}
-                        </p>
+                        <strong>@{post.username}</strong>
+                        <p>{post.content}</p>
 
                         <div className="actions">
                             <button onClick={() => likePost(post.id)}>
                                 ❤️ {post.likes_count || 0}
                             </button>
-
-                            <button>💬</button>
-                            <button>🔁</button>
                         </div>
+
+                        {/* INPUT DE COMENTÁRIO (AGORA EXISTE DE VERDADE) */}
+                        <div className="comment-box">
+                            <input
+                                placeholder="Escreva um comentário..."
+                                value={commentText[post.id] || ''}
+                                onChange={(e) =>
+                                    setCommentText(prev => ({
+                                        ...prev,
+                                        [post.id]: e.target.value
+                                    }))
+                                }
+                            />
+
+                            <button onClick={() => addComment(post.id)}>
+                                Comentar
+                            </button>
+                        </div>
+
+                        {/* LISTA DE COMENTÁRIOS */}
+                        {comments[post.id]?.map(c => (
+                            <div key={c.id} className="comment">
+                                <strong>@{c.username || 'user'}</strong>
+                                <p>{c.content}</p>
+                            </div>
+                        ))}
 
                     </div>
                 ))

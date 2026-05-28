@@ -250,6 +250,13 @@ body {
   color: #1d9bf0;
 }
 
+.comment {
+    margin-top: 6px;
+    padding-left: 10px;
+    border-left: 2px solid #ccc;
+    font-size: 14px;
+}
+
 /* =========================
    PROFILE
 ========================= */
@@ -295,6 +302,38 @@ body {
 
 .profile-stats strong {
   display: block;
+}
+
+.avatar-upload {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.edit-btn, .save-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.profile-top label {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-top label:hover::after {
+    content: "Alterar";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 /* =========================
