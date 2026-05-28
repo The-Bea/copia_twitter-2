@@ -1,9 +1,12 @@
+from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from users.models import Follow
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
+from users.models import Profile
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -52,4 +55,22 @@ def add_comment(request, pk):
     )
 
     serializer = CommentSerializer(comment)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def me(request):
+    user = request.user
+
+    return Response({
+        'id': user.id,
+        'username': user.username,
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_posts(request):
+    posts = Post.objects.filter(user=request.user)
+    serializer = PostSerializer(posts, many=True)
+
     return Response(serializer.data)

@@ -6,4 +6,5 @@ urlpatterns = [
     path('create/', create_post),
     path('like/<int:pk>/', like_post),
     path('comment/<int:pk>/', add_comment),
+    path('my-posts/', my_posts),
 ]
