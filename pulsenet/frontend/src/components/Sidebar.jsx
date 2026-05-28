@@ -1,15 +1,42 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 function Sidebar() {
-    return (
-        <div className="sidebar">
-        <h1>PulseNet</h1>
+    const navigate = useNavigate()
+    const location = useLocation()
 
-        <nav>
-            <Link to="/">Home</Link>
-            <Link to="/perfil">Perfil</Link>
-        </nav>
-        </div>
+    function logout() {
+        localStorage.removeItem('token')
+        navigate('/')
+    }
+
+    const isActive = (path) => location.pathname === path
+
+    return (
+        <aside className="sidebar">
+
+            <div className="logo">DizConect</div>
+
+            <nav className="nav">
+
+                <Link className={`nav-item ${isActive('/feed') ? 'active' : ''}`} to="/feed">
+                    <span>🏠</span> Home
+                </Link>
+
+                <Link className={`nav-item ${isActive('/trends') ? 'active' : ''}`} to="/trends">
+                    <span>🔥</span> Trends
+                </Link>
+
+                <Link className={`nav-item ${isActive('/perfil') ? 'active' : ''}`} to="/perfil">
+                    <span>👤</span> Perfil
+                </Link>
+
+            </nav>
+
+            <button className="logout-btn" onClick={logout}>
+                Sair
+            </button>
+
+        </aside>
     )
 }
 

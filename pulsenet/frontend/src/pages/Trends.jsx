@@ -16,7 +16,7 @@ function Trends() {
         </div>
 
         <div className="post">
-            <p>#PulseNet</p>
+            <p>#DizConect</p>
         </div>
         </div>
     )

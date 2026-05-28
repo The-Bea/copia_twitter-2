@@ -6,6 +6,7 @@ from .serializers import RegisterSerializer
 from .models import Profile
 from .models import Follow
 from posts.models import Post
+from posts.serializers import PostSerializer
 
 @api_view(['POST'])
 def register(request):
@@ -52,3 +53,15 @@ def my_posts(request):
     posts = Post.objects.filter(user=request.user)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def is_following(request, user_id):
+    target = User.objects.get(id=user_id)
+
+    following = Follow.objects.filter(
+        follower=request.user,
+        following=target
+    ).exists()
+
+    return Response({'following': following})

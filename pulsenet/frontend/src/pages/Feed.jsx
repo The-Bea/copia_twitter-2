@@ -11,12 +11,12 @@ function Feed() {
 
     async function fetchFeed() {
         try {
-        const response = await api.get('posts/feed/')
-        setPosts(response.data)
+            const response = await api.get('posts/feed/')
+            setPosts(response.data)
         } catch (err) {
-        console.log(err)
+            console.log(err)
         } finally {
-        setLoading(false)
+            setLoading(false)
         }
     }
 
@@ -43,92 +43,58 @@ function Feed() {
     }
 
     return (
-        <div className="layout">
+        <div className="page">
 
-        {/* SIDEBAR */}
-        <aside className="sidebar">
-            <h1>PulseNet</h1>
-
-            <nav>
-                <button onClick={() => navigate('/feed')}>
-                    🏠 Feed
-                </button>
-                <button onClick={() => navigate('/trends')}>
-                    🔥 Trends
-                </button>
-                <button onClick={() => navigate('/perfil')}>
-                    👤 Perfil
-                </button>
-            </nav>
-
-            <button className="logout" onClick={() => {
-                localStorage.removeItem('token')
-            navigate('/')
-            }}>
-                Sair
-            </button>
-        </aside>
-
-        {/* CONTEÚDO */}
-        <main className="feed">
-
-            <header className="feed-header">
-            <h2>Início</h2>
-            </header>
+            {/* HEADER */}
+            <div className="feed-header">
+                <h2>Home</h2>
+            </div>
 
             {/* COMPOSER */}
             <div className="composer">
-            <textarea
-                placeholder="O que está acontecendo?"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-            />
 
-            <button onClick={createPost}>
-                Postar
-            </button>
+                <textarea
+                    placeholder="O que está acontecendo?"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                />
+
+                <button onClick={createPost}>
+                    Postar
+                </button>
+
             </div>
 
             {/* FEED */}
             {loading ? (
-            <p>Carregando...</p>
+                <p>Carregando...</p>
             ) : (
-            posts.map((post) => (
-                <div className="post" key={post.id}>
+                posts.map((post) => (
+                    <div className="post" key={post.id}>
 
-                <div className="post-header">
-                    <div className="avatar"></div>
+                        <div className="post-header">
+                            <div className="avatar" />
 
-                    <div>
-                    <strong>@{post.username}</strong>
-                    <p className="time">agora</p>
+                            <div>
+                                <strong>@{post.username}</strong>
+                                <p className="time">agora</p>
+                            </div>
+                        </div>
+
+                        <p className="content">{post.content}</p>
+
+                        <div className="actions">
+                            <button onClick={() => likePost(post.id)}>
+                                ❤️ {post.likes_count || 0}
+                            </button>
+
+                            <button>💬</button>
+                            <button>🔁</button>
+                        </div>
+
                     </div>
-                </div>
-
-                <p className="content">{post.content}</p>
-
-                <div className="actions">
-                    <button onClick={() => likePost(post.id)}>
-                    ❤️ {post.likes_count || 0}
-                    </button>
-
-                    <button>💬</button>
-                    <button>🔁</button>
-                </div>
-
-                <div className="comments">
-                    {(post.comments || []).map((c) => (
-                    <p key={c.id}>
-                        <strong>@{c.username}</strong> {c.content}
-                    </p>
-                    ))}
-                </div>
-
-                </div>
-            ))
+                ))
             )}
-
-        </main>
 
         </div>
     )

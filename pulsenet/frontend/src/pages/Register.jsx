@@ -45,7 +45,7 @@ function Register() {
         <div className="auth-box">
 
             <h1>Criar conta</h1>
-            <p>Junte-se ao PulseNet</p>
+            <p>Junte-se ao DizConect</p>
 
             {error && <div className="error">{error}</div>}
 

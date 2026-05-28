@@ -2,24 +2,31 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from users.models import Follow
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
-from users.models import Profile
+
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def feed(request):
-    following = request.user.profile.following.all()
+    user = request.user
+
+    following_ids = Follow.objects.filter(
+        follower=user
+    ).values_list('following_id', flat=True)
 
     posts = Post.objects.filter(
-        user__profile__in=following
+        user_id__in=list(following_ids) + [user.id]
     ).order_by('-created_at')
 
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
+
+#  CRIAR POST
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
@@ -31,6 +38,8 @@ def create_post(request):
     serializer = PostSerializer(post)
     return Response(serializer.data)
 
+
+#  LIKE / UNLIKE
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def like_post(request, pk):
@@ -43,6 +52,8 @@ def like_post(request, pk):
 
     return Response({'likes': post.likes.count()})
 
+
+#  COMENTÁRIO
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_comment(request, pk):
@@ -57,6 +68,8 @@ def add_comment(request, pk):
     serializer = CommentSerializer(comment)
     return Response(serializer.data)
 
+
+#  ME
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me(request):
@@ -67,6 +80,8 @@ def me(request):
         'username': user.username,
     })
 
+
+# MEUS POSTS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_posts(request):

@@ -48,7 +48,7 @@ function Login() {
 
         <div className="auth-box">
 
-            <h1>PulseNet</h1>
+            <h1>DizConect</h1>
             <p>Entre para continuar</p>
 
             {error && <div className="error">{error}</div>}

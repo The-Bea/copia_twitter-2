@@ -1,29 +1,29 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+import Layout from './components/Layout'
+
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Feed from './pages/Feed'
 import Profile from './pages/Profile'
 import Trends from './pages/Trends'
 
-
 function App() {
   return (
-    <div className="app-layout">
+    <BrowserRouter>
+      <Routes>
 
-      <Sidebar />
+        <Route path='/' element={<Login />} />
+        <Route path='/register' element={<Register />} />
 
-      <div className="main-content">
-        <Routes>
-          <Route path='/' element={<Login />} />
-          <Route path='/register' element={<Register />} />
+        <Route element={<Layout />}>
           <Route path='/feed' element={<Feed />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="/trends" element={<Trends />} />
-        </Routes>
-      </div>
+          <Route path='/perfil' element={<Profile />} />
+          <Route path='/trends' element={<Trends />} />
+        </Route>
 
-    </div>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
